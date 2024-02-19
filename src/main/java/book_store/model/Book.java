@@ -16,8 +16,7 @@ public class Book {
     private String title;
     @Column(nullable = false)
     private String author;
-    @ToString.Exclude
-    @Column(name = "isbn", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String isbn;
     @Column(nullable = false)
     private BigDecimal price;
