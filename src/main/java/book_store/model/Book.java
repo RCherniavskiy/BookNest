@@ -1,12 +1,18 @@
 package book_store.model;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import java.math.BigDecimal;
 
 @Entity
 @Data
+@SQLDelete(sql = "Update books SET is_deleted = TRUE WHERE id = ?")
+@Where(clause = "is_deleted=FALSE")
 @Table(name = "books")
 public class Book {
     @Id
@@ -22,4 +28,6 @@ public class Book {
     private BigDecimal price;
     private String description;
     private String coverImage;
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 }

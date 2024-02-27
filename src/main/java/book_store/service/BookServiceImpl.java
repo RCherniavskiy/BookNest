@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import book_store.model.Book;
 import java.util.List;
-import java.util.Random;
 
 @RequiredArgsConstructor
 @Service
@@ -26,7 +25,7 @@ public class BookServiceImpl implements BookService{
     @Override
     public BookDto findById(Long id) {
         Book book = bookRepository.findById(id).orElseThrow(
-                ()-> new EntityNotFoundException("Can`t find employee by id" + id)
+                ()-> new EntityNotFoundException("Can`t find book by id" + id)
         );
         return bookMapper.toDto(book);
     }
@@ -36,5 +35,18 @@ public class BookServiceImpl implements BookService{
         return bookRepository.findAll().stream()
                 .map(bookMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public BookDto updateById(CreateBookRequestDto requestDto, Long id) {
+        Book bookToUpdate = bookMapper.toModel(requestDto);
+        bookToUpdate.setId(id);
+        Book updatedBook = bookRepository.save(bookToUpdate);
+        return bookMapper.toDto(updatedBook);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        bookRepository.deleteById(id);
     }
 }
