@@ -1,6 +1,7 @@
 package book_store.controller;
 
 import book_store.dto.BookDto;
+import book_store.dto.BookSearchParameters;
 import book_store.dto.CreateBookRequestDto;
 import book_store.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,10 @@ public class BookController {
     @PutMapping("/{id}")
     public BookDto updateBook(@PathVariable Long id, @RequestBody CreateBookRequestDto requestDto) {
         return bookService.updateById(requestDto, id);
+    }
+
+    @GetMapping("/search")
+    public List<BookDto> search(BookSearchParameters searchParameters) {
+        return bookService.search(searchParameters);
     }
 }
