@@ -1,9 +1,7 @@
 package book_store.model;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.ToString;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 

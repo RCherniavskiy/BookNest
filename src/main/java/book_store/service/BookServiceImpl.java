@@ -1,7 +1,7 @@
 package book_store.service;
 
 import book_store.dto.BookDto;
-import book_store.dto.BookSearchParameters;
+import book_store.dto.book.BookSearchParameters;
 import book_store.dto.CreateBookRequestDto;
 import book_store.exception.EntityNotFoundException;
 import book_store.mapper.BookMapper;
