@@ -3,14 +3,13 @@ package book_store.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
+import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
 
 @Entity
 @Data
 @SQLDelete(sql = "Update books SET is_deleted = TRUE WHERE id = ?")
-@Where(clause = "is_deleted=FALSE")
+@SQLRestriction(value = "is_deleted = FALSE")
 @Table(name = "books")
 public class Book {
     @Id

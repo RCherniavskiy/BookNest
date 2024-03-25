@@ -3,17 +3,17 @@ package book_store.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Data
 @SQLDelete(sql = "Update users SET is_deleted = TRUE WHERE id = ?")
-@Where(clause = "is_deleted=FALSE")
+@SQLRestriction(value = "is_deleted = FALSE")
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
+    private Long id;
     @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)

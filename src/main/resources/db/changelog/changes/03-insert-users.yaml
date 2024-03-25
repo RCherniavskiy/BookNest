@@ -24,4 +24,3 @@ databaseChangeLog:
               - column: {name: password, value: "1234"}
               - column: {name: first_name, value: "John"}
               - column: {name: last_name, value: "John"}
-
