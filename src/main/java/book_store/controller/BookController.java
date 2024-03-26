@@ -1,7 +1,7 @@
 package book_store.controller;
 
 import book_store.dto.BookDto;
-import book_store.dto.BookSearchParameters;
+import book_store.dto.book.BookSearchParameters;
 import book_store.dto.CreateBookRequestDto;
 import book_store.service.BookService;
 import jakarta.validation.Valid;
