@@ -13,6 +13,7 @@ public class Role {
     private Long id;
     @NotNull
     @Column(columnDefinition = "varchar")
+    @Enumerated(EnumType.STRING)
     private RoleName name;
 
     public enum RoleName {
