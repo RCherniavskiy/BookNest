@@ -5,6 +5,8 @@ import lombok.Data;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -26,6 +28,13 @@ public class Book {
     private String description;
     @Column(name = "cover_image")
     private String coverImage;
+    @ManyToMany(cascade = { CascadeType.MERGE })
+    @JoinTable(
+            name = "book_category",
+            joinColumns = { @JoinColumn(name = "book_id") },
+            inverseJoinColumns = { @JoinColumn(name = "category_id") }
+    )
+    private Set<Category> categories = new HashSet<>();
     @Column(name = "is_deleted",nullable = false)
     private boolean isDeleted = false;
 }

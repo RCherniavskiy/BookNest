@@ -3,8 +3,10 @@ package book_store.service;
 import book_store.dto.BookDto;
 import book_store.dto.book.BookSearchParameters;
 import book_store.dto.CreateBookRequestDto;
+import book_store.dto.category.BookDtoWithoutCategoryIds;
 import book_store.exception.EntityNotFoundException;
 import book_store.mapper.BookMapper;
+import book_store.model.Category;
 import book_store.repository.book.BookRepository;
 import book_store.repository.book.BookSpecificationBuilder;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 import book_store.model.Book;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +28,17 @@ public class BookServiceImpl implements BookService{
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
         Book book = bookMapper.toModel(requestDto);
+        Set<Long> categoryIds = requestDto.getCategoryIds();
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            Set<Category> categories = categoryIds.stream()
+                    .map(id -> {
+                        Category category = new Category();
+                        category.setId(id);
+                        return category;
+                    } )
+                    .collect(Collectors.toSet());
+            book.setCategories(categories);
+        }
         return bookMapper.toDto(bookRepository.save(book));
     }
 
@@ -62,5 +77,14 @@ public class BookServiceImpl implements BookService{
                 .stream()
                 .map(bookMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(Long categoryId) {
+        Category category = new Category();
+        category.setId(categoryId);
+        return bookRepository.findAllByCategoriesContaining(category).stream()
+                .map(bookMapper::toDtoWithoutCategories)
+                .collect(Collectors.toList());
     }
 }
