@@ -9,6 +9,5 @@ import java.util.Collection;
 import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
-
     List<Book> findAllByCategoriesContaining(Category category);
 }
