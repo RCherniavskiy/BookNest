@@ -5,10 +5,7 @@ import book_store.dto.BookDto;
 import book_store.dto.CreateBookRequestDto;
 import book_store.dto.category.BookDtoWithoutCategoryIds;
 import book_store.model.Book;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import book_store.model.Category;
 import java.util.stream.Collectors;
 
@@ -26,5 +23,15 @@ public interface BookMapper {
         bookDto.setCategoryIds(book.getCategories().stream()
                 .map(Category::getId)
                 .collect(Collectors.toSet()));
+    }
+
+    @Named("bookFromId")
+    default Book bookFromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        Book book = new Book();
+        book.setId(id);
+        return book;
     }
 }
