@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: create-book-category-table
-      author: your_name
+      author: Ruslan
       changes:
         - createTable:
             tableName: book_category
