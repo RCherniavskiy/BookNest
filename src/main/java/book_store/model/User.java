@@ -2,6 +2,8 @@ package book_store.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +13,8 @@ import java.util.Collection;
 import java.util.Set;
 
 @Entity
-@Data
+@Setter
+@Getter
 @SQLDelete(sql = "Update users SET is_deleted = TRUE WHERE id = ?")
 @SQLRestriction(value = "is_deleted = FALSE")
 @Table(name = "users")

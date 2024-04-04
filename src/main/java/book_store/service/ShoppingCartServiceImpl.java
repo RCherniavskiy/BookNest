@@ -3,6 +3,7 @@ package book_store.service;
 import book_store.dto.shoppingCart.AddToCartRequest;
 import book_store.dto.shoppingCart.ShoppingCartDto;
 import book_store.dto.cartItemDto.UpdateCartItemRequest;
+import book_store.exception.EntityNotFoundException;
 import book_store.mapper.BookMapper;
 import book_store.mapper.CartItemMapper;
 import book_store.mapper.ShoppingCartMapper;
@@ -22,8 +23,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ShoppingCartServiceImpl implements ShoppingCartService{
     private final ShoppingCartRepository shoppingCartRepository;
-    private final ShoppingCartMapper shoppingCartMapper;
     private final CartItemRepository cartItemRepository;
+    private final ShoppingCartMapper shoppingCartMapper;
     private final BookMapper bookMapper;
     private final CartItemMapper cartItemMapper;
 
@@ -66,7 +67,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService{
     @Override
     public ShoppingCartDto updateCartItemQuantity(Long cartItemId, UpdateCartItemRequest request) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart item with id " + cartItemId + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Cart item with id " + cartItemId + " not found"));
         Book book = cartItem.getBook();
         cartItem.setQuantity(request.getQuantity());
         cartItemRepository.save(cartItem);
@@ -77,7 +78,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService{
     @Override
     public void removeBookFromCart(Long cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("CartItem with id " + cartItemId + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("CartItem with id " + cartItemId + " not found"));
         cartItemRepository.delete(cartItem);
     }
 }
