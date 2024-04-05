@@ -15,14 +15,8 @@ public interface OrderMapper {
     List<OrderDto> toDtoList(List<Order> orders);
 
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "orderItems", target = "orderItems")
     OrderDto toDto(Order orders);
 
-    default OrderItemDto mapOrderItem(OrderItem orderItem) {
-        OrderItemDto orderItemDto = new OrderItemDto();
-        orderItemDto.setId(orderItem.getId());
-        orderItemDto.setQuantity(orderItem.getQuantity());
-        orderItemDto.setBookId(orderItem.getBook().getId());
-        return orderItemDto;
-    }
+    @Mapping(source = "book.id", target = "bookId")
+    OrderItemDto mapOrderItem(OrderItem orderItem);
 }

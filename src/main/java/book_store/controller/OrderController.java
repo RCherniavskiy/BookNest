@@ -4,12 +4,14 @@ import book_store.dto.order.OrderDto;
 import book_store.dto.order.OrderRequest;
 import book_store.dto.order.UpdateOrderStatusRequest;
 import book_store.dto.orderItem.OrderItemDto;
+import book_store.model.Order;
 import book_store.model.User;
 import book_store.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -42,25 +44,24 @@ public class OrderController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update order status", description = "Endpoint for updating the status of an order")
     @PatchMapping("/{id}")
-    public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long id, @RequestBody UpdateOrderStatusRequest request) {
-        ResponseEntity<OrderDto> responseEntity = orderService.updateOrderStatus(id, request.getStatus());
-        OrderDto updatedOrderDto = responseEntity.getBody();
-        return ResponseEntity.ok(updatedOrderDto);
+    @ResponseStatus(HttpStatus.OK)
+    public OrderDto updateOrderStatus(@PathVariable Long id, @RequestBody UpdateOrderStatusRequest request) {
+        return orderService.updateOrderStatus(id, Order.Status.valueOf(request.getStatus()));
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "Retrieve all OrderItems for a specific order", description = "Endpoint for retrieving all OrderItems for a specific order")
     @GetMapping("/{orderId}/items")
-    public ResponseEntity<List<OrderItemDto>> getAllOrderItemsForOrder(@PathVariable Long orderId) {
-        List<OrderItemDto> orderItems = orderService.getAllOrderItems(orderId);
-        return ResponseEntity.ok(orderItems);
+    @ResponseStatus(HttpStatus.OK)
+    public List<OrderItemDto> getAllOrderItemsForOrder(@PathVariable Long orderId) {
+        return orderService.getAllOrderItems(orderId);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(summary = "Retrieve a specific OrderItem within an order", description = "Endpoint for retrieving a specific OrderItem within an order")
+    @Operation(summary = "Retrieve a specific Ord" +
+            "    @ResponseStatus(HttpStatus.OK)erItem within an order", description = "Endpoint for retrieving a specific OrderItem within an order")
     @GetMapping("/{orderId}/items/{itemId}")
-    public ResponseEntity<OrderItemDto> getOrderItemForOrder(@PathVariable Long orderId, @PathVariable Long itemId) {
-        OrderItemDto orderItem = orderService.getOrderItem(orderId, itemId);
-        return ResponseEntity.ok(orderItem);
+    public OrderItemDto getOrderItemForOrder(@PathVariable Long orderId, @PathVariable Long itemId) {
+        return orderService.getOrderItem(orderId, itemId);
     }
 }

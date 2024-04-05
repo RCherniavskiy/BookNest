@@ -67,13 +67,12 @@ public class OrderServiceImpl implements OrderService{
 
     @Transactional
     @Override
-    public ResponseEntity<OrderDto> updateOrderStatus(Long id, String status) {
+    public OrderDto updateOrderStatus(Long id, Order.Status status) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + id));
-        order.setStatus(Order.Status.valueOf(status));
+        order.setStatus(Order.Status.valueOf(status.name()));
         orderRepository.save(order);
-        OrderDto updatedOrderDto = orderMapper.toDto(order);
-        return ResponseEntity.ok(updatedOrderDto);
+        return orderMapper.toDto(order);
     }
 
     @Transactional
@@ -81,10 +80,7 @@ public class OrderServiceImpl implements OrderService{
     public List<OrderItemDto> getAllOrderItems(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + orderId));
-        Set<OrderItem> orderItems = order.getOrderItems();
-        return orderItems.stream()
-                .map(orderItemMapper::toDto)
-                .collect(Collectors.toList());
+        return orderItemMapper.toDtoList(order.getOrderItems());
     }
 
     @Transactional
