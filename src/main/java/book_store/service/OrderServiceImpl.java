@@ -14,12 +14,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -57,7 +55,6 @@ public class OrderServiceImpl implements OrderService{
         return orderMapper.toDto(order);
     }
 
-    @Transactional
     @Override
     public List<OrderDto> findAll(User user, Pageable pageable) {
         Page<Order> ordersPage = orderRepository.findByUser(user, pageable);
@@ -75,7 +72,6 @@ public class OrderServiceImpl implements OrderService{
         return orderMapper.toDto(order);
     }
 
-    @Transactional
     @Override
     public List<OrderItemDto> getAllOrderItems(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -83,7 +79,6 @@ public class OrderServiceImpl implements OrderService{
         return orderItemMapper.toDtoList(order.getOrderItems());
     }
 
-    @Transactional
     @Override
     public OrderItemDto getOrderItem(Long orderId, Long itemId) {
         Order order = orderRepository.findById(orderId)

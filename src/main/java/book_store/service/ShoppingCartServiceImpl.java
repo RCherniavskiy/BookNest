@@ -29,13 +29,10 @@ public class ShoppingCartServiceImpl implements ShoppingCartService{
     private final CartItemMapper cartItemMapper;
 
     @Override
-    @Transactional
     public ShoppingCartDto findUserShoppingCart(User user, Pageable pageable) {
         Page<ShoppingCart> page = shoppingCartRepository.findByUserId(user.getId(), pageable);
         ShoppingCart shoppingCart = page.getContent().get(0);
-        ShoppingCartDto dto = shoppingCartMapper.toDto(shoppingCart);
-        dto.setCartItems(shoppingCartMapper.mapCartItemsDto(shoppingCart.getCartItems()));
-        return dto;
+        return shoppingCartMapper.toDto(shoppingCart);
     }
 
     @Override
