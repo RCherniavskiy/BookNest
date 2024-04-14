@@ -1,7 +1,8 @@
 package book_store.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import java.math.BigDecimal;
@@ -9,7 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @SQLDelete(sql = "Update books SET is_deleted = TRUE WHERE id = ?")
 @SQLRestriction(value = "is_deleted = FALSE")
 @Table(name = "books")
