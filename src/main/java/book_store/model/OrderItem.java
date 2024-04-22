@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @Getter
 @SQLDelete(sql = "Update orderItems SET is_deleted = TRUE WHERE id = ?")
 @SQLRestriction(value = "is_deleted = FALSE")
-@Table(name = "orderitems")
+@Table(name = "order_items")
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
