@@ -1,0 +1,1 @@
+insert into books (id, price, title) values (1, 10, 'Kobzar');

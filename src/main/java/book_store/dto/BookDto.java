@@ -1,10 +1,12 @@
 package book_store.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
+@Accessors(chain = true)
 public class BookDto {
     private  Long id;
     private String title;
