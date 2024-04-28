@@ -2,8 +2,9 @@ package book_store.controller;
 
 import book_store.dto.BookDto;
 import book_store.dto.CreateBookRequestDto;
-import book_store.model.Book;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.util.NestedServletException;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 import javax.sql.DataSource;
@@ -23,12 +25,13 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -68,12 +71,13 @@ class BookControllerTest {
     @DisplayName("Get all books")
     void getAll_ReturnsAllBooks_ExpectedSuccess() throws Exception {
         List<BookDto> expected = new ArrayList<>();
+        Set<Long> categoryIds = new HashSet<>();
         expected.add(new BookDto().setId(1L).setTitle("Kobzar").setAuthor("Shevchenko")
-                .setPrice(BigDecimal.valueOf(10.99)).setIsbn("9460303332081"));
+                .setPrice(BigDecimal.valueOf(10.99)).setIsbn("9460303332081").setCategoryIds(categoryIds));
         expected.add(new BookDto().setId(2L).setTitle("Avatar").setAuthor("Unknow")
-                .setPrice(BigDecimal.valueOf(20.99)).setIsbn("9460306342021"));
+                .setPrice(BigDecimal.valueOf(20.99)).setIsbn("9460306342021").setCategoryIds(categoryIds));
         expected.add(new BookDto().setId(3L).setTitle("Terminator").setAuthor("Arnold")
-                .setPrice(BigDecimal.valueOf(30.99)).setIsbn("9460301332081"));
+                .setPrice(BigDecimal.valueOf(30.99)).setIsbn("9460301332081").setCategoryIds(categoryIds));
 
         MvcResult result = mockMvc.perform(
                         get("/books")
@@ -85,12 +89,7 @@ class BookControllerTest {
         BookDto[] actual = objectMapper.readValue(result.getResponse().getContentAsByteArray(), BookDto[].class);
         Assertions.assertEquals(3, actual.length);
         for (BookDto book : expected) {
-            Assertions.assertTrue(Arrays.stream(actual)
-                    .anyMatch(a -> a.getId().equals(book.getId())
-                            && a.getTitle().equals(book.getTitle())
-                            && a.getAuthor().equals(book.getAuthor())
-                            && a.getPrice().equals(book.getPrice())
-                            && a.getIsbn().equals(book.getIsbn())));
+            Assertions.assertTrue(Arrays.asList(actual).containsAll(expected));
         }
     }
 
@@ -98,12 +97,14 @@ class BookControllerTest {
     @Test
     @DisplayName("Get book by ID")
     void getBookById_ReturnsBookById_ExpectedSuccess() throws Exception {
+        Set<Long> categoryIds = new HashSet<>();
         BookDto expectedBook = new BookDto()
                 .setId(1L)
                 .setTitle("Kobzar")
                 .setAuthor("Shevchenko")
                 .setPrice(BigDecimal.valueOf(10.99))
-                .setIsbn("9460303332081");
+                .setIsbn("9460303332081")
+                .setCategoryIds(categoryIds);
 
         MvcResult result = mockMvc.perform(
                         get("/books/{id}", 1L)
@@ -114,11 +115,7 @@ class BookControllerTest {
 
         BookDto actualBook = objectMapper.readValue(result.getResponse().getContentAsByteArray(), BookDto.class);
 
-        Assertions.assertEquals(expectedBook.getId(), actualBook.getId());
-        Assertions.assertEquals(expectedBook.getTitle(), actualBook.getTitle());
-        Assertions.assertEquals(expectedBook.getAuthor(), actualBook.getAuthor());
-        Assertions.assertEquals(expectedBook.getPrice(), actualBook.getPrice());
-        Assertions.assertEquals(expectedBook.getIsbn(), actualBook.getIsbn());
+        Assertions.assertEquals(expectedBook, actualBook);
     }
 
     @Test
@@ -136,46 +133,44 @@ class BookControllerTest {
                 .setIsbn("9460306332081")
                 .setPrice(BigDecimal.valueOf(10.99));
 
-        BookDto expected = new BookDto()
-                .setAuthor(requestDto.getAuthor())
-                .setTitle(requestDto.getTitle())
-                .setDescription(requestDto.getDescription())
-                .setIsbn(requestDto.getIsbn())
-                .setPrice(requestDto.getPrice());
-
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
         MvcResult result = mockMvc.perform(
-                post("/books")
-                    .content(jsonRequest)
-                    .contentType(MediaType.APPLICATION_JSON)
+                        post("/books")
+                                .content(jsonRequest)
+                                .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(), BookDto.class);
         Assertions.assertNotNull(actual);
         Assertions.assertNotNull(actual.getId());
-        Assertions.assertEquals(expected.getAuthor(), actual.getAuthor());
-        EqualsBuilder.reflectionEquals(expected,actual,"id");
+        EqualsBuilder.reflectionEquals(requestDto, actual, "id");
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
+    @Sql(scripts = "classpath:database/books/add-kobzar-book-to-books-table.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @DisplayName("Delete a book")
     void delete_DeletesBookById_ExpectedSuccess() throws Exception {
-        Book book = new Book();
-                book.setId(4L);
-                book.setAuthor("John Doe");
-                book.setTitle("Book Title");
-                book.setDescription("Book Description");
-                book.setIsbn("9460306332081");
-                book.setPrice(BigDecimal.valueOf(10.99));
         mockMvc.perform(
                         delete("/books/{id}", 4L)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isNoContent());
-    }
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        assertThrows(ServletException.class, () -> {
+            mockMvc.perform(
+                            get("/books/{id}", 4L)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .with(user("user").roles("USER"))
+                    )
+                    .andExpect(status().isNotFound());
+        });
+        }
+
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
@@ -195,7 +190,12 @@ class BookControllerTest {
                                 .content(jsonRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.author").value("New Author"))
+                .andExpect(jsonPath("$.title").value("Updated Title"))
+                .andExpect(jsonPath("$.description").value("Updated Description"))
+                .andExpect(jsonPath("$.isbn").value("9460306332081"))
+                .andExpect(jsonPath("$.price").value(15.99));
     }
 
     @WithMockUser(username = "user", roles = {"USER"})
