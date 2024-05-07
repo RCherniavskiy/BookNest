@@ -42,7 +42,7 @@ class ShoppingCartControllerTest {
 
     @Test
     @DisplayName("Get shopping cart")
-    void getShoppingCart() throws Exception {
+    void getShoppingCart_ValidInput_ReturnsUserShoppingCart() throws Exception {
         ShoppingCartDto mockShoppingCartDto = createMockShoppingCartDto();
         User user = new User();
         Authentication authentication = new UsernamePasswordAuthenticationToken(user, null,
@@ -57,7 +57,7 @@ class ShoppingCartControllerTest {
 
     @Test
     @DisplayName("Add book to shopping cart")
-    void addBookToShoppingCart() throws Exception {
+    void addBookToShoppingCart_ValidRequest_ReturnsUpdatedShoppingCart() throws Exception {
         AddToCartRequest request = new AddToCartRequest();
         request.setBookId(123L);
         request.setQuantity(1);
@@ -78,7 +78,7 @@ class ShoppingCartControllerTest {
 
     @Test
     @DisplayName("Update the quantity of goods in the cart")
-    void updateCartItemQuantity() throws Exception {
+    void updateCartItemQuantity_ValidRequest_ReturnsUpdatedShoppingCart() throws Exception {
         Long cartItemId = 1L;
         int newQuantity = 2;
         UpdateCartItemRequest request = new UpdateCartItemRequest();

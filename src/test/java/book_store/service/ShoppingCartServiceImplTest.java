@@ -48,7 +48,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test findUserShoppingCart: Success - User Exists, ShoppingCart Returned")
-    void testFindUserShoppingCart_Success_UserExists_ShoppingCartReturned() {
+    void findUserShoppingCart_Success_ShoppingCartReturned() {
         User user = new User();
         user.setId(1L);
         ShoppingCart shoppingCart = new ShoppingCart();
@@ -66,7 +66,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test addBookToCart: Success - Book Added To Cart, CartItem Quantity Updated")
-    void testAddBookToCart_Success_BookAddedToCart_CartItemQuantityUpdated() {
+    void addBookToCart_Success_CartItemQuantityUpdated() {
         AddToCartRequest request = new AddToCartRequest();
         request.setBookId(1L);
         request.setQuantity(1);
@@ -94,7 +94,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test updateCartItemQuantity: Success")
-    public void testUpdateCartItemQuantity_Success() {
+    public void updateCartItemQuantity_Success() {
         long cartItemId = 1L;
         UpdateCartItemRequest request = new UpdateCartItemRequest();
         request.setQuantity(5);
@@ -113,7 +113,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test updateCartItemQuantity: Not Found")
-    public void testUpdateCartItemQuantity_NotFound() {
+    public void updateCartItemQuantity_NotFound() {
         Long cartItemId = 1L;
         UpdateCartItemRequest request = new UpdateCartItemRequest();
         request.setQuantity(2);
@@ -124,7 +124,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test removeBookFromCart: Success")
-    void testRemoveBookFromCart_Success() {
+    void removeBookFromCart_Success() {
         long cartItemId = 1L;
         CartItem cartItem = new CartItem();
         cartItem.setId(cartItemId);
@@ -135,7 +135,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test removeBookFromCart: CartItem Not Found")
-    void testRemoveBookFromCart_CartItemNotFound() {
+    void removeBookFromCart_CartItemNotFound() {
         long cartItemId = 1L;
         when(cartItemRepository.findById(cartItemId)).thenReturn(java.util.Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> shoppingCartService.removeBookFromCart(cartItemId));
@@ -143,7 +143,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test addBookToCart: New ShoppingCart")
-    void testAddBookToCart_NewShoppingCart() {
+    void addBookToCart_NewShoppingCart() {
         AddToCartRequest request = new AddToCartRequest();
         request.setBookId(1L);
         request.setQuantity(1);
@@ -172,7 +172,7 @@ class ShoppingCartServiceImplTest {
 
     @Test
     @DisplayName("Test addBookToCart: Existing ShoppingCart")
-    void testAddBookToCart_ExistingShoppingCart() {
+    void addBookToCart_ExistingShoppingCart() {
         AddToCartRequest request = new AddToCartRequest();
         request.setBookId(1L);
         request.setQuantity(1);
