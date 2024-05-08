@@ -1,6 +1,7 @@
 package book_store.controller;
 
 import book_store.dto.category.CategoryDto;
+import book_store.service.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +15,25 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CategoryControllerTest {
     protected static MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private CategoryService categoryService;
 
     @BeforeAll
     static void beforeAll(
@@ -77,7 +81,7 @@ class CategoryControllerTest {
 
         CategoryDto actual = objectMapper.readValue(result.getResponse().getContentAsString(), CategoryDto.class);
 
-        Assertions.assertNotNull(actual);
+        assertNotNull(actual);
 
         Assertions.assertEquals(expected.getName(), actual.getName());
         Assertions.assertEquals(expected.getDescription(), actual.getDescription());
@@ -109,13 +113,27 @@ class CategoryControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
         CategoryDto category = objectMapper.readValue(result.getResponse().getContentAsString(), CategoryDto.class);
-        Assertions.assertNotNull(category);
+        assertNotNull(category);
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     @DisplayName("Update a category")
     void updateCategory_UpdatesCategoryDetails_ExpectedSuccess() throws Exception {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setName("Updated Category Name");
+        categoryDto.setDescription("Updated Category Description");
+
+        String jsonRequest = objectMapper.writeValueAsString(categoryDto);
+
+        mockMvc.perform(
+                        put("/categories/{id}", 1L)
+                                .content(jsonRequest)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Updated Category Name"))
+                .andExpect(jsonPath("$.description").value("Updated Category Description"));
     }
 
     @WithMockUser(username = "admin", roles = {"ADMIN"})
