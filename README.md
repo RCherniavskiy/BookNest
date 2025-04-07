@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Welcome to the Online Book Store API project, a robust solution built using Spring Boot. This platform aims to provide an efficient and user-friendly experience for managing an online bookstore, catering to both customers and administrators.
+Welcome to the BookNest API project, a robust solution built using Spring Boot. This platform aims to provide an efficient and user-friendly experience for managing an online bookstore, catering to both customers and administrators.
 
 ## Inspiration
 
