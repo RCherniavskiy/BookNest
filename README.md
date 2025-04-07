@@ -1,6 +1,6 @@
 ![1GIF](OnlineBookStore.gif)
 
-# Online Book Store Project API
+# BookNest Project API
 
 ## Introduction
 
